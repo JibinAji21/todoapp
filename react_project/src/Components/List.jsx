@@ -4,7 +4,7 @@ import axios from 'axios'
 
 function List(){
     const [data,SetData] = useState([])
-    const [editing,setediting]=useState(false)
+    const [editing,setEditing]=useState(false)
     const [editdata,setEditData]=useState(null)
     useEffect(()=>{
         axios.get("http://127.0.0.1:8000/api/todo/").then((res)=>{
@@ -17,10 +17,16 @@ function List(){
         setEditing(true)
         setEditData(task)
     }
+    const updateDtls = (id,task) =>{
+        setEditing(false)
+        axios.put('http://127.0.0.1:8000/api/todo/',task).then(res=>{
+            SetData(data.map((prv)=>prv.id===id ? res.data : prv))
+        }).catch(error =>console.log(error.message))
+    }
     return(
 
         <div className="container">
-            <h1>Display Details</h1>"http://127.0.0.1:8000/api/todo/"
+            <h1>Display Details</h1>
             <table className="table">
                 <thead> 
                     <tr>
@@ -32,7 +38,7 @@ function List(){
                 <tbody>
                     {data.map((value,index)=>(
                         <tr key={index}>
-                            <td>{value.title}</td>
+                            <td>{value.task}</td>
                             <td>{value.description}</td>
                             <td>{value.completed ? 'completed':'not'}</td>
                             <td><button className="btn btn-outline-info" onClick={()=>{Edit_dtls(value)}}>Edit</button></td>
@@ -41,7 +47,7 @@ function List(){
                     ))}
                 </tbody>
             </table>
-            {editing ? <EditForm curTask= {editdata}/>:null}
+            {editing ? <EditForm curTask= {editdata} updatefun={updateDtls}/>:null}
         </div>
     )
 
@@ -49,10 +55,18 @@ function List(){
 
 const EditForm=({curTask})=>{
     const[task,setTask]=useState(curTask)
+    const handleChange = (e) =>{
+        const {name,value} = e.target 
+        setTask({...task,[name]:value})
+    }
+    const handleSubmit = (e) =>{
+        e.preventDefault()
+        updataefun(task.id,task)
+    }
     return(
-        <form>
-            <input type="text" name="title" id="title" value={task.title} />
-            <input type="text" name="description" id="description" value={task.description}/>
+        <form onSubmit={handleSubmit}>
+            <input type="text" name="title" id="title" value={task.task} onChange={handleChange} />
+            <input type="text" name="description" id="description" value={task.description} onChange={handleChange}/>
             <input type="submit"  value="Update"/>
 
         </form>
