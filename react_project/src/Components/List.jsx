@@ -1,5 +1,6 @@
 import { useEffect,useState } from "react";
 import axios from 'axios'
+import Add from "./Add"
 
 
 function List(){
@@ -53,7 +54,7 @@ function List(){
                     ))}
                 </tbody>
             </table>
-            {editing ? <EditForm curTask= {editdata} updatefun={updateDtls}/>:null}
+            {editing ? <EditForm curTask= {editdata} updatefun={updateDtls}/>:<Add/>}
         </div>
     )
 
